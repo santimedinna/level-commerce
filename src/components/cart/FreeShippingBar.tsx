@@ -12,7 +12,7 @@ const ZONE_COPY: Record<ShippingZone, { chip: string; prefix: string }> = {
     prefix: "en Córdoba Capital",
   },
   nacional: {
-    chip: "Resto del país",
+    chip: "Otra provincia",
     prefix: "a todo el país",
   },
 };

@@ -46,6 +46,28 @@ const FALLBACK_ZONES: ShippingZoneRow[] = [
   },
 ];
 
+const COUNTRIES = [
+  { code: "AR", flag: "🇦🇷", name: "Argentina", prefix: "+54" },
+  { code: "BO", flag: "🇧🇴", name: "Bolivia", prefix: "+591" },
+  { code: "BR", flag: "🇧🇷", name: "Brasil", prefix: "+55" },
+  { code: "CL", flag: "🇨🇱", name: "Chile", prefix: "+56" },
+  { code: "CO", flag: "🇨🇴", name: "Colombia", prefix: "+57" },
+  { code: "CR", flag: "🇨🇷", name: "Costa Rica", prefix: "+506" },
+  { code: "CU", flag: "🇨🇺", name: "Cuba", prefix: "+53" },
+  { code: "EC", flag: "🇪🇨", name: "Ecuador", prefix: "+593" },
+  { code: "ES", flag: "🇪🇸", name: "España", prefix: "+34" },
+  { code: "GT", flag: "🇬🇹", name: "Guatemala", prefix: "+502" },
+  { code: "HN", flag: "🇭🇳", name: "Honduras", prefix: "+504" },
+  { code: "MX", flag: "🇲🇽", name: "México", prefix: "+52" },
+  { code: "NI", flag: "🇳🇮", name: "Nicaragua", prefix: "+505" },
+  { code: "PA", flag: "🇵🇦", name: "Panamá", prefix: "+507" },
+  { code: "PY", flag: "🇵🇾", name: "Paraguay", prefix: "+595" },
+  { code: "PE", flag: "🇵🇪", name: "Perú", prefix: "+51" },
+  { code: "DO", flag: "🇩🇴", name: "República Dominicana", prefix: "+1" },
+  { code: "UY", flag: "🇺🇾", name: "Uruguay", prefix: "+598" },
+  { code: "VE", flag: "🇻🇪", name: "Venezuela", prefix: "+58" },
+];
+
 const PROVINCES = [
   "Buenos Aires",
   "CABA",
@@ -269,6 +291,7 @@ export default function CheckoutClient({
   const [selectedMethodId, setSelectedMethodId] = useState("");
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [orderReady, setOrderReady] = useState(false);
+  const [phoneCountry, setPhoneCountry] = useState("AR");
   const [focused, setFocused] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>({
     name: "",
@@ -369,7 +392,7 @@ export default function CheckoutClient({
       customer: {
         name: form.name.trim(),
         email: form.email.trim(),
-        phone: form.phone.trim(),
+        phone: `${COUNTRIES.find((c) => c.code === phoneCountry)?.prefix ?? "+54"} ${form.phone.trim()}`,
       },
       shipping: {
         methodId: selectedMethod.id,
@@ -621,18 +644,68 @@ export default function CheckoutClient({
                   </Field>
 
                   <Field label="Teléfono / WhatsApp" required error={errors.phone}>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={form.phone}
-                      onChange={handleChange}
-                      onFocus={() => setFocused("phone")}
-                      onBlur={() => setFocused(null)}
-                      placeholder="+54 9 351 000-0000"
-                      autoComplete="tel"
-                      className={ic}
-                      style={brd("phone", !!errors.phone)}
-                    />
+                    {/* Grupo: selector de país + número */}
+                    <div
+                      style={{
+                        display: "flex",
+                        borderRadius: 2,
+                        overflow: "hidden",
+                        border: `1px solid ${
+                          errors.phone
+                            ? "var(--color-danger)"
+                            : focused === "phone" || focused === "phoneCountry"
+                            ? "var(--color-ink)"
+                            : "var(--color-line)"
+                        }`,
+                        backgroundColor: "var(--color-bg)",
+                        transition: "border-color 0.15s ease",
+                      }}
+                    >
+                      <select
+                        value={phoneCountry}
+                        onChange={(e) => setPhoneCountry(e.target.value)}
+                        onFocus={() => setFocused("phoneCountry")}
+                        onBlur={() => setFocused(null)}
+                        aria-label="Código de país"
+                        className="font-body text-sm outline-none shrink-0"
+                        style={{
+                          width: 96,
+                          padding: "10px 22px 10px 10px",
+                          borderRight: "1px solid var(--color-line)",
+                          backgroundColor: "var(--color-surface)",
+                          color: "var(--color-ink)",
+                          cursor: "pointer",
+                          appearance: "none",
+                          WebkitAppearance: "none",
+                          backgroundImage:
+                            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 9 5'%3E%3Cpath d='M0 0l4.5 5L9 0z' fill='%236b6b6b'/%3E%3C/svg%3E\")",
+                          backgroundRepeat: "no-repeat",
+                          backgroundPosition: "calc(100% - 8px) center",
+                        }}
+                      >
+                        {COUNTRIES.map((c) => (
+                          <option key={c.code} value={c.code}>
+                            {c.flag} {c.prefix}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleChange}
+                        onFocus={() => setFocused("phone")}
+                        onBlur={() => setFocused(null)}
+                        placeholder="9 351 000-0000"
+                        autoComplete="tel-national"
+                        className="font-body text-sm flex-1 px-3 py-2.5 outline-none min-w-0"
+                        style={{
+                          backgroundColor: "var(--color-bg)",
+                          color: "var(--color-ink)",
+                          border: "none",
+                        }}
+                      />
+                    </div>
                   </Field>
                 </div>
 
@@ -671,7 +744,7 @@ export default function CheckoutClient({
                         transition: "all 0.15s ease",
                       }}
                     >
-                      {z === "local" ? "Córdoba Capital" : "Resto del país"}
+                      {z === "local" ? "Córdoba Capital" : "Otra provincia"}
                     </button>
                   );
                 })}
