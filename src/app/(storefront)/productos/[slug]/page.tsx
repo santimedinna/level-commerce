@@ -6,6 +6,7 @@ import { getProductBySlug } from "@/lib/supabase/products";
 import { formatPrice } from "@/lib/colors";
 import VariantSelector from "@/components/product/VariantSelector";
 import ProductCard from "@/components/product/ProductCard";
+import FavoriteButton from "@/components/product/FavoriteButton";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -72,12 +73,15 @@ export default async function ProductoDetallePage({ params }: Props) {
               >
                 {product.name}
               </h1>
-              <p
-                className="font-body text-2xl mt-3"
-                style={{ color: "var(--color-ink)" }}
-              >
-                {formatPrice(product.base_price)}
-              </p>
+              <div className="flex items-center gap-3 mt-3">
+                <p
+                  className="font-body text-2xl"
+                  style={{ color: "var(--color-ink)" }}
+                >
+                  {formatPrice(product.base_price)}
+                </p>
+                <FavoriteButton productId={product.id} variant="detail" />
+              </div>
             </div>
 
             {product.description && (

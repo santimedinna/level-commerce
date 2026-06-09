@@ -1,38 +1,6 @@
 export default function HomePage() {
   return (
     <main className="flex flex-col min-h-screen" style={{ backgroundColor: "var(--color-bg)" }}>
-      {/* Header */}
-      <header
-        className="px-6 py-5 flex items-center justify-between"
-        style={{ borderBottom: "1px solid var(--color-line)" }}
-      >
-        <span
-          className="font-display text-base font-semibold tracking-tight"
-          style={{ color: "var(--color-ink)" }}
-        >
-          Level Commerce
-        </span>
-        <nav className="flex items-center gap-6">
-          <a
-            href="#"
-            className="font-body text-sm transition-colors"
-            style={{ color: "var(--color-ink-soft)" }}
-          >
-            Productos
-          </a>
-          <a
-            href="#"
-            className="font-body text-sm px-4 py-2 rounded-sm"
-            style={{
-              backgroundColor: "var(--color-accent)",
-              color: "var(--color-accent-ink)",
-            }}
-          >
-            Empezar
-          </a>
-        </nav>
-      </header>
-
       {/* Hero */}
       <section className="flex-1 px-6 py-32 md:py-48 max-w-5xl mx-auto w-full">
         <p
