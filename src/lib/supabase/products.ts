@@ -8,26 +8,16 @@ export async function getActiveProducts(): Promise<ProductWithVariants[]> {
     .from("products")
     .select(
       `
-      id,
-      name,
-      slug,
-      description,
-      category_id,
-      base_price,
-      images,
-      is_active,
-      created_at,
-      product_variants (
-        id,
-        color,
-        stock
-      )
+      id, name, slug, description, category_id,
+      base_price, images, is_active, created_at,
+      category:categories ( id, name, slug ),
+      product_variants ( id, size, color, stock )
     `
     )
     .order("created_at", { ascending: true });
 
   if (error) throw new Error(`Error al traer productos: ${error.message}`);
-  return (data ?? []) as ProductWithVariants[];
+  return (data ?? []) as unknown as ProductWithVariants[];
 }
 
 export async function getProductBySlug(
@@ -49,7 +39,6 @@ export async function getProductBySlug(
 
   if (error || !product) return null;
 
-  // Fetch related product IDs
   const { data: links } = await supabase
     .from("related_products")
     .select("related_product_id")
@@ -65,13 +54,13 @@ export async function getProductBySlug(
         `
         id, name, slug, description, category_id,
         base_price, images, is_active, created_at,
-        product_variants ( id, color, stock )
+        product_variants ( id, size, color, stock )
       `
       )
       .in("id", relatedIds)
       .eq("is_active", true);
-    related = (relatedProducts ?? []) as ProductWithVariants[];
+    related = (relatedProducts ?? []) as unknown as ProductWithVariants[];
   }
 
-  return { ...product, related } as ProductDetail;
+  return { ...product, related } as unknown as ProductDetail;
 }

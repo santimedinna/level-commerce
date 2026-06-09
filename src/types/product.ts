@@ -1,3 +1,9 @@
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export interface ProductVariant {
   id: string;
   product_id: string;
@@ -22,7 +28,8 @@ export interface Product {
 }
 
 export interface ProductWithVariants extends Product {
-  product_variants: Pick<ProductVariant, "id" | "color" | "stock">[];
+  category?: Category | null;
+  product_variants: Pick<ProductVariant, "id" | "size" | "color" | "stock">[];
 }
 
 export type DetailVariant = Pick<
