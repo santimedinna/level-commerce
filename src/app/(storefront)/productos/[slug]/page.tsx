@@ -101,7 +101,16 @@ export default async function ProductoDetallePage({ params }: Props) {
             )}
 
             <div style={{ borderTop: "1px solid var(--color-line)" }} className="pt-6">
-              <VariantSelector variants={product.product_variants} />
+              <VariantSelector
+                variants={product.product_variants}
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  slug: product.slug,
+                  image: image,
+                  basePrice: product.base_price,
+                }}
+              />
             </div>
           </div>
         </div>

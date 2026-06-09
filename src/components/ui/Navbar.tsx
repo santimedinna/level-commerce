@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useFavorites } from "@/store/favorites";
+import { useCart } from "@/store/cart";
 
 function HeartIcon() {
   return (
@@ -21,8 +22,55 @@ function HeartIcon() {
   );
 }
 
+function BagIcon() {
+  return (
+    <svg
+      width={18}
+      height={18}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <path d="M16 10a4 4 0 0 1-8 0" />
+    </svg>
+  );
+}
+
+function NavBadge({ count }: { count: number }) {
+  if (count === 0) return null;
+  return (
+    <span
+      className="absolute font-body"
+      style={{
+        top: -5,
+        right: -7,
+        backgroundColor: "var(--color-ink)",
+        color: "var(--color-accent-ink)",
+        borderRadius: "50%",
+        width: 15,
+        height: 15,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 9,
+        lineHeight: 1,
+        fontWeight: 500,
+      }}
+    >
+      {count > 9 ? "9+" : count}
+    </span>
+  );
+}
+
 export default function Navbar() {
-  const { count } = useFavorites();
+  const { count: favCount } = useFavorites();
+  const { itemCount, openCart } = useCart();
 
   return (
     <header
@@ -52,40 +100,35 @@ export default function Navbar() {
           Productos
         </Link>
 
+        {/* Favoritos */}
         <Link
           href="/favoritos"
           className="relative flex items-center justify-center"
           aria-label={
-            count > 0
-              ? `Favoritos — ${count} guardado${count !== 1 ? "s" : ""}`
+            favCount > 0
+              ? `Favoritos — ${favCount} guardado${favCount !== 1 ? "s" : ""}`
               : "Favoritos"
           }
           style={{ color: "var(--color-ink-soft)" }}
         >
           <HeartIcon />
-          {count > 0 && (
-            <span
-              className="absolute font-body"
-              style={{
-                top: -5,
-                right: -7,
-                backgroundColor: "var(--color-ink)",
-                color: "var(--color-accent-ink)",
-                borderRadius: "50%",
-                width: 15,
-                height: 15,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 9,
-                lineHeight: 1,
-                fontWeight: 500,
-              }}
-            >
-              {count > 9 ? "9+" : count}
-            </span>
-          )}
+          <NavBadge count={favCount} />
         </Link>
+
+        {/* Carrito */}
+        <button
+          onClick={openCart}
+          className="relative flex items-center justify-center"
+          aria-label={
+            itemCount > 0
+              ? `Carrito — ${itemCount} ${itemCount === 1 ? "artículo" : "artículos"}`
+              : "Carrito"
+          }
+          style={{ color: "var(--color-ink-soft)" }}
+        >
+          <BagIcon />
+          <NavBadge count={itemCount} />
+        </button>
       </nav>
     </header>
   );

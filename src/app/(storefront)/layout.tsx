@@ -1,8 +1,8 @@
 import { FavoritesProvider } from "@/store/favorites";
+import { CartProvider } from "@/store/cart";
 import Navbar from "@/components/ui/Navbar";
+import CartDrawer from "@/components/cart/CartDrawer";
 
-// Server Component — puede renderizar Client Components (FavoritesProvider, Navbar)
-// y pasar Server Component output como children al provider.
 export default function StorefrontLayout({
   children,
 }: {
@@ -10,8 +10,11 @@ export default function StorefrontLayout({
 }) {
   return (
     <FavoritesProvider>
-      <Navbar />
-      {children}
+      <CartProvider>
+        <Navbar />
+        <CartDrawer />
+        {children}
+      </CartProvider>
     </FavoritesProvider>
   );
 }

@@ -3,16 +3,29 @@
 import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { COLOR_MAP, LIGHT_COLORS, sortSizes } from "@/lib/colors";
+import { useCart } from "@/store/cart";
 import type { DetailVariant } from "@/types/product";
+
+interface ProductInfo {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  basePrice: number;
+}
 
 interface Props {
   variants: DetailVariant[];
+  product: ProductInfo;
 }
 
-export default function VariantSelector({ variants }: Props) {
+export default function VariantSelector({ variants, product }: Props) {
   const prefersReducedMotion = useReducedMotion();
+  const { addItem, openCart } = useCart();
+
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [added, setAdded] = useState(false);
 
   const uniqueColors = [...new Set(variants.map((v) => v.color))];
   const uniqueSizes = sortSizes([...new Set(variants.map((v) => v.size))]);
@@ -23,7 +36,9 @@ export default function VariantSelector({ variants }: Props) {
 
   function getSizeStock(size: string): { stock: number; exists: boolean } {
     if (selectedColor) {
-      const v = variants.find((v) => v.size === size && v.color === selectedColor);
+      const v = variants.find(
+        (v) => v.size === size && v.color === selectedColor
+      );
       if (!v) return { stock: 0, exists: false };
       return { stock: v.stock, exists: true };
     }
@@ -55,6 +70,29 @@ export default function VariantSelector({ variants }: Props) {
   function handleSizeSelect(size: string, unavailable: boolean) {
     if (unavailable) return;
     setSelectedSize((prev) => (prev === size ? null : size));
+  }
+
+  function handleAddToCart() {
+    if (!canAddToCart || !selectedVariant || !selectedColor || !selectedSize)
+      return;
+
+    addItem({
+      variantId: selectedVariant.id,
+      productId: product.id,
+      productName: product.name,
+      productSlug: product.slug,
+      productImage: product.image,
+      size: selectedSize,
+      color: selectedColor,
+      price: selectedVariant.price_override ?? product.basePrice,
+      quantity: 1,
+      stock: selectedVariant.stock,
+    });
+
+    setAdded(true);
+    openCart();
+
+    setTimeout(() => setAdded(false), 1800);
   }
 
   let stockMessage = "";
@@ -228,31 +266,60 @@ export default function VariantSelector({ variants }: Props) {
         </AnimatePresence>
       </div>
 
-      {/* CTA — lógica del carrito se conecta en Fase 4 */}
+      {/* CTA */}
       <motion.button
+        onClick={handleAddToCart}
         whileTap={
           prefersReducedMotion || !canAddToCart ? undefined : { scale: 0.98 }
         }
         transition={{ duration: 0.1 }}
         disabled={!canAddToCart}
-        className="font-body text-sm w-full py-4 tracking-wide"
+        className="font-body text-sm w-full py-4 tracking-wide overflow-hidden relative"
         style={{
           borderRadius: 2,
-          backgroundColor: canAddToCart
-            ? "var(--color-accent)"
-            : "var(--color-line)",
-          color: canAddToCart
-            ? "var(--color-accent-ink)"
-            : "var(--color-ink-soft)",
+          backgroundColor:
+            added
+              ? "var(--color-success)"
+              : canAddToCart
+              ? "var(--color-accent)"
+              : "var(--color-line)",
+          color:
+            added || canAddToCart
+              ? "var(--color-accent-ink)"
+              : "var(--color-ink-soft)",
           cursor: canAddToCart ? "pointer" : "not-allowed",
           transition: "background-color 0.2s ease, color 0.2s ease",
         }}
       >
-        {!selectedColor || !selectedSize
-          ? "Seleccioná talle y color"
-          : !canAddToCart
-          ? "Sin stock"
-          : "Agregar al carrito"}
+        <AnimatePresence mode="wait">
+          {added ? (
+            <motion.span
+              key="added"
+              initial={prefersReducedMotion ? undefined : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.15 }}
+              className="block"
+            >
+              ✓ Agregado
+            </motion.span>
+          ) : (
+            <motion.span
+              key="add"
+              initial={prefersReducedMotion ? undefined : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.15 }}
+              className="block"
+            >
+              {!selectedColor || !selectedSize
+                ? "Seleccioná talle y color"
+                : !canAddToCart
+                ? "Sin stock"
+                : "Agregar al carrito"}
+            </motion.span>
+          )}
+        </AnimatePresence>
       </motion.button>
     </div>
   );
