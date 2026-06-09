@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useCart } from "@/store/cart";
 import CartItem from "@/components/cart/CartItem";
+import FreeShippingBar from "@/components/cart/FreeShippingBar";
 import { formatPrice } from "@/lib/colors";
 
 export default function CartDrawer() {
@@ -96,6 +97,9 @@ export default function CartDrawer() {
                 ×
               </button>
             </div>
+
+            {/* Barra de envío gratis — solo cuando hay items */}
+            {items.length > 0 && <FreeShippingBar />}
 
             {/* Items — scrolleable */}
             <div className="flex-1 overflow-y-auto px-5">
