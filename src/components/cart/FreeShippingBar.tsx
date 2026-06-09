@@ -6,14 +6,14 @@ import { formatPrice } from "@/lib/colors";
 
 // ─── Copy por zona ────────────────────────────────────────────────────────────
 
-const ZONE_COPY: Record<ShippingZone, { chip: string; label: string }> = {
+const ZONE_COPY: Record<ShippingZone, { chip: string; prefix: string }> = {
   local: {
     chip: "Córdoba Capital",
-    label: "Envío gratis a Córdoba Capital",
+    prefix: "en Córdoba Capital",
   },
   nacional: {
     chip: "Resto del país",
-    label: "Envío gratis a todo el país",
+    prefix: "a todo el país",
   },
 };
 
@@ -106,13 +106,15 @@ export default function FreeShippingBar() {
         />
       </div>
 
-      {/* Aclaración de zona */}
-      <p
-        className="font-body text-xs mt-2"
-        style={{ color: "var(--color-ink-soft)" }}
-      >
-        {ZONE_COPY[zone].label}
-      </p>
+      {/* Aclaración de zona — solo cuando no alcanzó el umbral */}
+      {!isFree && (
+        <p
+          className="font-body text-xs mt-2"
+          style={{ color: "var(--color-ink-soft)" }}
+        >
+          Envío gratis {ZONE_COPY[zone].prefix} desde {formatPrice(threshold)}
+        </p>
+      )}
     </div>
   );
 }
