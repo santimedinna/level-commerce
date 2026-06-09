@@ -1,12 +1,12 @@
-export default function CheckoutPage() {
-  return (
-    <main className="px-6 py-12">
-      <h1 className="font-display text-4xl font-semibold" style={{ color: "var(--color-ink)" }}>
-        Checkout
-      </h1>
-      <p className="font-body text-base mt-4" style={{ color: "var(--color-ink-soft)" }}>
-        Una pantalla, invitado por defecto, MercadoPago Bricks — Fase 5
-      </p>
-    </main>
-  );
+import type { Metadata } from "next";
+import { getActiveShippingZones } from "@/lib/supabase/shipping";
+import CheckoutClient from "@/components/checkout/CheckoutClient";
+
+export const metadata: Metadata = {
+  title: "Checkout",
+};
+
+export default async function CheckoutPage() {
+  const zones = await getActiveShippingZones().catch(() => []);
+  return <CheckoutClient zones={zones} />;
 }
