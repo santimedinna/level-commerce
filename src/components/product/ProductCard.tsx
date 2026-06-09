@@ -4,26 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import type { ProductWithVariants } from "@/types/product";
-
-const COLOR_MAP: Record<string, string> = {
-  Blanco: "#f5f5f5",
-  Negro: "#1a1a1a",
-  Azul: "#2c4a7c",
-  Beige: "#c8a882",
-  Verde: "#3d6b4f",
-  Gris: "#9a9a9a",
-  Bordó: "#7c2637",
-};
-
-const LIGHT_COLORS = new Set(["Blanco"]);
-
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(price);
-}
+import { COLOR_MAP, LIGHT_COLORS, formatPrice } from "@/lib/colors";
 
 interface Props {
   product: ProductWithVariants;

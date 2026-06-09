@@ -24,3 +24,13 @@ export interface Product {
 export interface ProductWithVariants extends Product {
   product_variants: Pick<ProductVariant, "id" | "color" | "stock">[];
 }
+
+export type DetailVariant = Pick<
+  ProductVariant,
+  "id" | "size" | "color" | "stock" | "price_override"
+>;
+
+export interface ProductDetail extends Product {
+  product_variants: DetailVariant[];
+  related: ProductWithVariants[];
+}
