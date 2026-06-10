@@ -1,12 +1,12 @@
+import type { Metadata } from "next";
+import LegalPage from "@/components/legales/LegalPage";
+import { privacidad } from "@/content/legales/privacidad";
+
+export const metadata: Metadata = {
+  title: "Política de Privacidad",
+  robots: { index: false },
+};
+
 export default function PrivacidadPage() {
-  return (
-    <main className="px-6 py-12 max-w-3xl mx-auto">
-      <h1 className="font-display text-4xl font-semibold" style={{ color: "var(--color-ink)" }}>
-        Política de privacidad
-      </h1>
-      <p className="font-body text-base mt-4" style={{ color: "var(--color-ink-soft)" }}>
-        Plantilla editable — Fase 7
-      </p>
-    </main>
-  );
+  return <LegalPage content={privacidad} />;
 }

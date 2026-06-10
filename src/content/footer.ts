@@ -20,6 +20,13 @@ export const footerContent = {
     { label: "Cambios y devoluciones", href: "/legales/cambios" },
   ],
 
+  // ── Botón de Arrepentimiento ─────────────────────────────────────────────
+  // Obligatorio por Disposición 954/2025. El label debe ser EXACTAMENTE este.
+  arrepentimiento: {
+    label: "Botón de Arrepentimiento",
+    href: "/legales/arrepentimiento",
+  },
+
   // ── Contacto ────────────────────────────────────────────────────────────
   // Email real de Level Growth Agency (no se reemplaza por cliente — es el contacto de la agencia)
   contact: {

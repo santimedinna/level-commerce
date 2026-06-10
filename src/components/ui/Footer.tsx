@@ -140,6 +140,20 @@ export default function Footer() {
                     </Link>
                   </li>
                 ))}
+
+                {/* Botón de Arrepentimiento — obligatorio Disp. 954/2025, visualmente diferenciado */}
+                <li style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                  <Link
+                    href={footerContent.arrepentimiento.href}
+                    className="font-body text-sm inline-flex items-center gap-1.5 transition-opacity hover:opacity-80"
+                    style={{ color: "rgba(255,255,255,0.8)" }}
+                  >
+                    <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    {footerContent.arrepentimiento.label}
+                  </Link>
+                </li>
               </ul>
             </div>
 
