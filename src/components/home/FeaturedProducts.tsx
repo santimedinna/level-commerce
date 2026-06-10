@@ -60,18 +60,12 @@ export default async function FeaturedProducts() {
         <div className="flex sm:hidden justify-center mt-10">
           <Link
             href={featuredSection.cta.href}
-            className="font-body text-sm px-7 py-3 transition-colors"
+            className="font-body text-sm px-7 py-3 transition-colors hover:bg-[var(--color-surface)]"
             style={{
               border: "1px solid var(--color-line)",
               borderRadius: 2,
               color: "var(--color-ink)",
             }}
-            onMouseEnter={(e) =>
-              ((e.target as HTMLElement).style.backgroundColor = "var(--color-surface)")
-            }
-            onMouseLeave={(e) =>
-              ((e.target as HTMLElement).style.backgroundColor = "transparent")
-            }
           >
             {featuredSection.cta.label}
           </Link>
