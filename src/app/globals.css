@@ -39,3 +39,12 @@ body {
   color: var(--color-ink);
   font-family: var(--font-dm-sans), sans-serif;
 }
+
+/* Oculta la barra de scroll preservando el scroll (usado en trust bar y nav) */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
