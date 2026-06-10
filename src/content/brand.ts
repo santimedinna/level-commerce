@@ -57,3 +57,18 @@ export const brand = {
 
   country: "Argentina",
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  AGENCIA — Level Growth Agency (datos reales, no se reemplazan por cliente)
+//
+//  Este objeto representa a la agencia que construye el boilerplate.
+//  Se usa en el footer de la demo y en el crédito de producción.
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const agency = {
+  name: "Level Growth Agency",
+  contact: {
+    email: "contacto@levelgrowthagency.com",
+  },
+  credit: "Desarrollado por Level Growth Agency",
+};

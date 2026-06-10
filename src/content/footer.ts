@@ -1,4 +1,4 @@
-import { brand } from "./brand";
+import { brand, agency } from "./brand";
 
 // Contenido del pie de página.
 // Todos los valores [DEMO] se reemplazan al adaptar para una marca real.
@@ -21,12 +21,9 @@ export const footerContent = {
   ],
 
   // ── Contacto ────────────────────────────────────────────────────────────
+  // Email real de Level Growth Agency (no se reemplaza por cliente — es el contacto de la agencia)
   contact: {
-    email: brand.contact.email,
-    whatsapp: brand.contact.whatsapp,
-    whatsappMessage: brand.contact.whatsappMessage,
-    instagram: brand.contact.instagram,
-    instagramUrl: brand.contact.instagramUrl,
+    email: agency.contact.email,
   },
 
   // ── Medios de pago ──────────────────────────────────────────────────────
@@ -50,6 +47,5 @@ export const footerContent = {
   // [DEMO] copyrightEntity → nombre legal de la marca
   copyrightEntity: brand.name,
 
-  // [DEMO] credit → quitar o cambiar según acuerdo con el cliente
-  credit: "Desarrollado por Level Growth Agency",
+  credit: agency.credit,
 };

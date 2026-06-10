@@ -60,16 +60,20 @@ export default function Footer() {
         color: "var(--color-accent-ink)",
       }}
     >
-      <div className="max-w-screen-xl mx-auto px-4 md:px-8 pt-14 pb-8">
+      <div className="max-w-screen-xl mx-auto px-4 md:px-8 pt-12 pb-8">
 
         {/* ── Grilla principal ───────────────────────────────────────────── */}
+        {/*
+          Mobile:  marca (full) → links 2-col → pago chips → trust → copyright
+          Desktop: 4 columnas [marca (2fr) | tienda | legal | pago]
+        */}
         <div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1.2fr] gap-10 lg:gap-8 pb-12"
+          className="pb-10"
           style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
         >
 
-          {/* Columna marca */}
-          <div>
+          {/* Columna marca — siempre arriba y full width */}
+          <div className="mb-8">
             {brand.logo ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={brand.logo} alt={brand.logoAlt} style={{ height: 28 }} />
@@ -82,103 +86,92 @@ export default function Footer() {
               </p>
             )}
             <p
-              className="font-body text-sm leading-relaxed mt-3 max-w-xs"
+              className="font-body text-sm leading-relaxed mt-2 max-w-xs"
               style={dimText}
             >
               {footerContent.description}
             </p>
+            <a
+              href={`mailto:${footerContent.contact.email}`}
+              className="font-body text-sm mt-4 inline-block transition-opacity hover:opacity-80"
+              style={dimText}
+            >
+              {footerContent.contact.email}
+            </a>
+          </div>
 
-            {/* Contacto */}
-            <div className="flex flex-col gap-2 mt-6">
-              <a
-                href={`mailto:${footerContent.contact.email}`}
-                className="font-body text-sm transition-opacity hover:opacity-80"
-                style={dimText}
-              >
-                {footerContent.contact.email}
-              </a>
-              <a
-                href={`https://wa.me/${footerContent.contact.whatsapp}?text=${encodeURIComponent(footerContent.contact.whatsappMessage)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-body text-sm transition-opacity hover:opacity-80"
-                style={dimText}
-              >
-                WhatsApp
-              </a>
-              <a
-                href={footerContent.contact.instagramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-body text-sm transition-opacity hover:opacity-80"
-                style={dimText}
-              >
-                {footerContent.contact.instagram}
-              </a>
+          {/* Links — 2 columnas en mobile y desktop */}
+          <div className="grid grid-cols-2 lg:grid-cols-[1fr_1fr_1.2fr] gap-8">
+
+            {/* Tienda */}
+            <div>
+              <p className="font-body text-xs font-semibold mb-4" style={sectionLabel}>
+                Tienda
+              </p>
+              <ul className="flex flex-col gap-2.5">
+                {footerContent.navigation.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="font-body text-sm transition-opacity hover:opacity-80"
+                      style={dimText}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
 
-          {/* Columna tienda */}
-          <div>
-            <p className="font-body text-xs font-semibold mb-5" style={sectionLabel}>
-              Tienda
-            </p>
-            <ul className="flex flex-col gap-3">
-              {footerContent.navigation.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="font-body text-sm transition-opacity hover:opacity-80"
-                    style={dimText}
+            {/* Legal */}
+            <div>
+              <p className="font-body text-xs font-semibold mb-4" style={sectionLabel}>
+                Legal
+              </p>
+              <ul className="flex flex-col gap-2.5">
+                {footerContent.legal.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="font-body text-sm transition-opacity hover:opacity-80"
+                      style={dimText}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Medios de pago — columna propia en desktop, separado en mobile */}
+            <div className="col-span-2 lg:col-span-1 mt-2 lg:mt-0">
+              <p className="font-body text-xs font-semibold mb-4" style={sectionLabel}>
+                Medios de pago
+              </p>
+              {/* [DEMO] Reemplazar con logos SVG/PNG reales */}
+              <div className="flex flex-wrap gap-2">
+                {footerContent.paymentMethods.map((method) => (
+                  <span
+                    key={method}
+                    className="font-body text-xs px-2.5 py-1"
+                    style={{
+                      border: "1px solid rgba(255,255,255,0.15)",
+                      borderRadius: 4,
+                      color: "rgba(255,255,255,0.55)",
+                    }}
                   >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Columna legal */}
-          <div>
-            <p className="font-body text-xs font-semibold mb-5" style={sectionLabel}>
-              Legal
-            </p>
-            <ul className="flex flex-col gap-3">
-              {footerContent.legal.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="font-body text-sm transition-opacity hover:opacity-80"
-                    style={dimText}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Columna medios de pago */}
-          <div>
-            <p className="font-body text-xs font-semibold mb-5" style={sectionLabel}>
-              Medios de pago
-            </p>
-            {/* [DEMO] Reemplazar texto con logos SVG/PNG reales */}
-            <ul className="flex flex-col gap-2.5">
-              {footerContent.paymentMethods.map((method) => (
-                <li key={method}>
-                  <span className="font-body text-sm" style={dimText}>
                     {method}
                   </span>
-                </li>
-              ))}
-            </ul>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
 
         {/* ── Señales de confianza ───────────────────────────────────────── */}
         <div
-          className="flex flex-wrap items-center gap-x-6 gap-y-3 py-8"
+          className="flex flex-wrap items-center gap-x-6 gap-y-3 py-7"
           style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
         >
           {footerContent.trust.map(({ label, icon }) => (
@@ -194,7 +187,7 @@ export default function Footer() {
         </div>
 
         {/* ── Copyright ─────────────────────────────────────────────────── */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 pt-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pt-6">
           <p className="font-body text-xs" style={mutedText}>
             © {year} {footerContent.copyrightEntity}. Todos los derechos reservados.
           </p>

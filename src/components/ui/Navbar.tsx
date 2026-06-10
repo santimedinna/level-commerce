@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
@@ -8,6 +8,7 @@ import { useFavorites } from "@/store/favorites";
 import { useCart } from "@/store/cart";
 import { navContent } from "@/content/nav";
 import { brand } from "@/content/brand";
+import SearchOverlay from "./SearchOverlay";
 
 // ─── Íconos ───────────────────────────────────────────────────────────────────
 
@@ -85,10 +86,13 @@ function NavBadge({ count }: { count: number }) {
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { count: favCount } = useFavorites();
   const { itemCount, openCart } = useCart();
   const pathname = usePathname();
   const prefersReducedMotion = useReducedMotion();
+
+  const closeSearch = useCallback(() => setSearchOpen(false), []);
 
   // Cierra el menú al navegar
   useEffect(() => {
@@ -97,11 +101,13 @@ export default function Navbar() {
 
   // Bloquea scroll del body mientras el menú está abierto
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    if (!searchOpen) {
+      document.body.style.overflow = menuOpen ? "hidden" : "";
+    }
     return () => {
-      document.body.style.overflow = "";
+      if (!searchOpen) document.body.style.overflow = "";
     };
-  }, [menuOpen]);
+  }, [menuOpen, searchOpen]);
 
   const favLabel =
     favCount > 0
@@ -112,12 +118,14 @@ export default function Navbar() {
       ? `Carrito — ${itemCount} ${itemCount === 1 ? "artículo" : "artículos"}`
       : "Carrito";
 
-  // Links completos del menú mobile (navbar links + búsqueda + favoritos)
-  const mobileMenuLinks = [
-    ...navContent.links,
-    navContent.favorites,
-    { label: "Buscar", href: navContent.search.href },
-  ];
+  // Links del menú mobile (sin búsqueda — se maneja por separado como botón)
+  const mobileNavLinks = [...navContent.links, navContent.favorites];
+
+  function openSearch() {
+    setMenuOpen(false);
+    // pequeño delay para que el menú cierre antes de abrir el overlay
+    setTimeout(() => setSearchOpen(true), menuOpen ? 160 : 0);
+  }
 
   return (
     <>
@@ -209,14 +217,14 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <Link
-              href={navContent.search.href}
+            <button
+              onClick={() => setSearchOpen(true)}
               aria-label={navContent.search.label}
-              className="flex items-center justify-center transition-colors"
+              className="flex items-center justify-center transition-opacity hover:opacity-60"
               style={{ color: "var(--color-ink-soft)" }}
             >
               <IconSearch />
-            </Link>
+            </button>
           </nav>
 
           {/* Derecha: Favoritos + Carrito */}
@@ -242,6 +250,9 @@ export default function Navbar() {
           </div>
         </div>
       </header>
+
+      {/* ── Buscador (overlay) ───────────────────────────────────────────── */}
+      <SearchOverlay isOpen={searchOpen} onClose={closeSearch} />
 
       {/* ── Menú mobile (overlay fullscreen) ────────────────────────────── */}
       <AnimatePresence>
@@ -288,7 +299,7 @@ export default function Navbar() {
             {/* Links del menú */}
             <nav className="flex-1 px-4 pt-8 pb-10" aria-label="Menú mobile">
               <ul>
-                {mobileMenuLinks.map((link, i) => (
+                {mobileNavLinks.map((link, i) => (
                   <motion.li
                     key={link.href}
                     initial={
@@ -313,13 +324,31 @@ export default function Navbar() {
                     </Link>
                   </motion.li>
                 ))}
+
+                {/* Buscar — botón, no link */}
+                <motion.li
+                  initial={prefersReducedMotion ? undefined : { opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 + mobileNavLinks.length * 0.06, duration: 0.18 }}
+                >
+                  <button
+                    onClick={openSearch}
+                    className="font-display text-4xl font-semibold block py-5 leading-none w-full text-left"
+                    style={{
+                      color: "var(--color-ink)",
+                      borderBottom: "1px solid var(--color-line)",
+                    }}
+                  >
+                    Buscar
+                  </button>
+                </motion.li>
               </ul>
 
               {/* Datos de contacto al pie del menú */}
               <motion.div
                 initial={prefersReducedMotion ? undefined : { opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.05 + mobileMenuLinks.length * 0.06 + 0.1, duration: 0.2 }}
+                transition={{ delay: 0.05 + (mobileNavLinks.length + 1) * 0.06 + 0.1, duration: 0.2 }}
                 className="flex flex-col gap-2 mt-12"
               >
                 <a
