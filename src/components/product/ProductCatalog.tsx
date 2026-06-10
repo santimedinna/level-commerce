@@ -281,14 +281,20 @@ function FilterPanel({
 
 interface Props {
   products: ProductWithVariants[];
+  initialCategorySlug?: string;
 }
 
-export default function ProductCatalog({ products }: Props) {
+export default function ProductCatalog({ products, initialCategorySlug }: Props) {
   const prefersReducedMotion = useReducedMotion();
 
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
+  const [filters, setFilters] = useState<Filters>(() => {
+    if (!initialCategorySlug) return EMPTY_FILTERS;
+    const cat = products.map((p) => p.category).find((c) => c?.slug === initialCategorySlug);
+    if (!cat) return EMPTY_FILTERS;
+    return { ...EMPTY_FILTERS, categoryIds: [cat.id] };
+  });
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Debounce de búsqueda

@@ -6,7 +6,12 @@ export const metadata: Metadata = {
   title: "Productos",
 };
 
-export default async function ProductosPage() {
+interface Props {
+  searchParams: Promise<{ categoria?: string }>;
+}
+
+export default async function ProductosPage({ searchParams }: Props) {
+  const { categoria } = await searchParams;
   const products = await getActiveProducts();
 
   return (
@@ -19,7 +24,7 @@ export default async function ProductosPage() {
           Productos
         </h1>
 
-        <ProductCatalog products={products} />
+        <ProductCatalog products={products} initialCategorySlug={categoria} />
       </div>
     </main>
   );
