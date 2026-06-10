@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
@@ -9,6 +9,7 @@ import { useCart } from "@/store/cart";
 import { navContent } from "@/content/nav";
 import { brand } from "@/content/brand";
 import SearchOverlay from "./SearchOverlay";
+import type { Category } from "@/types/product";
 
 // ─── Íconos ───────────────────────────────────────────────────────────────────
 
@@ -58,6 +59,16 @@ function IconClose() {
   );
 }
 
+function IconChevron({ open }: { open: boolean }) {
+  return (
+    <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+      style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.18s ease" }}
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
+
 function NavBadge({ count }: { count: number }) {
   if (count === 0) return null;
   return (
@@ -65,16 +76,12 @@ function NavBadge({ count }: { count: number }) {
       className="absolute font-body flex items-center justify-center"
       aria-hidden="true"
       style={{
-        top: -5,
-        right: -7,
-        width: 15,
-        height: 15,
+        top: -5, right: -7,
+        width: 15, height: 15,
         borderRadius: "50%",
         backgroundColor: "var(--color-ink)",
         color: "var(--color-accent-ink)",
-        fontSize: 9,
-        fontWeight: 500,
-        lineHeight: 1,
+        fontSize: 9, fontWeight: 500, lineHeight: 1,
       }}
     >
       {count > 9 ? "9+" : count}
@@ -82,11 +89,71 @@ function NavBadge({ count }: { count: number }) {
   );
 }
 
+// ─── Dropdown de categorías (desktop) ─────────────────────────────────────────
+
+interface DropdownProps {
+  categories: Category[];
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+}
+
+function CategoryDropdown({ categories, onMouseEnter, onMouseLeave }: DropdownProps) {
+  const prefersReducedMotion = useReducedMotion();
+  return (
+    <motion.div
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -6 }}
+      transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+      className="absolute"
+      style={{
+        top: "calc(100% + 10px)",
+        left: 0,
+        minWidth: 176,
+        backgroundColor: "var(--color-bg)",
+        border: "1px solid var(--color-line)",
+        borderRadius: 4,
+        boxShadow: "0 8px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)",
+        paddingTop: 6,
+        paddingBottom: 6,
+      }}
+    >
+      {categories.map((cat) => (
+        <Link
+          key={cat.slug}
+          href={`/productos?categoria=${cat.slug}`}
+          className="font-body text-sm block px-4 py-2.5 transition-colors hover:text-[var(--color-ink)]"
+          style={{ color: "var(--color-ink-soft)" }}
+        >
+          {cat.name}
+        </Link>
+      ))}
+      <div style={{ borderTop: "1px solid var(--color-line)", margin: "6px 0" }} />
+      <Link
+        href="/productos"
+        className="font-body text-sm block px-4 py-2.5 transition-colors hover:text-[var(--color-ink)]"
+        style={{ color: "var(--color-ink-soft)" }}
+      >
+        Ver todo →
+      </Link>
+    </motion.div>
+  );
+}
+
 // ─── Componente principal ─────────────────────────────────────────────────────
 
-export default function Navbar() {
+interface NavbarProps {
+  categories?: Category[];
+}
+
+export default function Navbar({ categories = [] }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [catOpen, setCatOpen] = useState(false);
+  const catCloseTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
   const { count: favCount } = useFavorites();
   const { itemCount, openCart } = useCart();
   const pathname = usePathname();
@@ -94,38 +161,42 @@ export default function Navbar() {
 
   const closeSearch = useCallback(() => setSearchOpen(false), []);
 
+  // Hover del dropdown de categorías (con pequeño delay para evitar parpadeo)
+  const openCat = useCallback(() => {
+    clearTimeout(catCloseTimer.current);
+    setCatOpen(true);
+  }, []);
+  const closeCat = useCallback(() => {
+    catCloseTimer.current = setTimeout(() => setCatOpen(false), 90);
+  }, []);
+
   // Cierra el menú al navegar
   useEffect(() => {
     setMenuOpen(false);
+    setCatOpen(false);
   }, [pathname]);
 
-  // Bloquea scroll del body mientras el menú está abierto
   useEffect(() => {
     if (!searchOpen) {
       document.body.style.overflow = menuOpen ? "hidden" : "";
     }
-    return () => {
-      if (!searchOpen) document.body.style.overflow = "";
-    };
+    return () => { if (!searchOpen) document.body.style.overflow = ""; };
   }, [menuOpen, searchOpen]);
 
-  const favLabel =
-    favCount > 0
-      ? `Favoritos — ${favCount} guardado${favCount !== 1 ? "s" : ""}`
-      : "Favoritos";
-  const cartLabel =
-    itemCount > 0
-      ? `Carrito — ${itemCount} ${itemCount === 1 ? "artículo" : "artículos"}`
-      : "Carrito";
+  // Limpia el timer al desmontar
+  useEffect(() => () => clearTimeout(catCloseTimer.current), []);
 
-  // Links del menú mobile (sin búsqueda — se maneja por separado como botón)
+  const favLabel = favCount > 0 ? `Favoritos — ${favCount} guardado${favCount !== 1 ? "s" : ""}` : "Favoritos";
+  const cartLabel = itemCount > 0 ? `Carrito — ${itemCount} ${itemCount === 1 ? "artículo" : "artículos"}` : "Carrito";
+
   const mobileNavLinks = [...navContent.links, navContent.favorites];
 
   function openSearch() {
     setMenuOpen(false);
-    // pequeño delay para que el menú cierre antes de abrir el overlay
     setTimeout(() => setSearchOpen(true), menuOpen ? 160 : 0);
   }
+
+  const hasCategories = categories.length > 0;
 
   return (
     <>
@@ -140,11 +211,8 @@ export default function Navbar() {
           WebkitBackdropFilter: "blur(8px)",
         }}
       >
-
-        {/* Mobile layout (< lg) */}
+        {/* Mobile (< lg) */}
         <div className="flex lg:hidden items-center justify-between h-full px-4">
-
-          {/* Hamburger */}
           <button
             onClick={() => setMenuOpen(true)}
             aria-label={navContent.mobileMenuAriaLabel}
@@ -156,7 +224,6 @@ export default function Navbar() {
             <IconMenu />
           </button>
 
-          {/* Logo centrado */}
           <Link
             href={navContent.logoHref}
             className="absolute left-1/2 -translate-x-1/2 font-display text-sm font-semibold"
@@ -165,58 +232,63 @@ export default function Navbar() {
             {navContent.logoLabel}
           </Link>
 
-          {/* Derecha: Favoritos + Carrito */}
           <div className="flex items-center gap-4">
-            <Link
-              href={navContent.favorites.href}
-              aria-label={favLabel}
+            <Link href={navContent.favorites.href} aria-label={favLabel}
               className="relative flex items-center justify-center"
               style={{ color: "var(--color-ink-soft)" }}
             >
-              <IconHeart />
-              <NavBadge count={favCount} />
+              <IconHeart /><NavBadge count={favCount} />
             </Link>
-            <button
-              onClick={openCart}
-              aria-label={cartLabel}
+            <button onClick={openCart} aria-label={cartLabel}
               className="relative flex items-center justify-center"
               style={{ color: "var(--color-ink-soft)" }}
             >
-              <IconBag />
-              <NavBadge count={itemCount} />
+              <IconBag /><NavBadge count={itemCount} />
             </button>
           </div>
         </div>
 
-        {/* Desktop layout (≥ lg) */}
+        {/* Desktop (≥ lg) */}
         <div className="hidden lg:flex items-center justify-between h-full px-8">
-
-          {/* Logo */}
-          <Link
-            href={navContent.logoHref}
+          <Link href={navContent.logoHref}
             className="font-display text-sm font-semibold"
             style={{ color: "var(--color-ink)" }}
           >
             {navContent.logoLabel}
           </Link>
 
-          {/* Navegación central */}
           <nav className="flex items-center gap-6" aria-label="Navegación principal">
-            {navContent.links.map((link) => (
+
+            {/* "Productos" con dropdown de categorías */}
+            <div
+              className="relative"
+              onMouseEnter={hasCategories ? openCat : undefined}
+              onMouseLeave={hasCategories ? closeCat : undefined}
+            >
               <Link
-                key={link.href}
-                href={link.href}
-                className="font-body text-sm transition-colors"
+                href="/productos"
+                className="font-body text-sm flex items-center gap-1.5 transition-colors"
                 style={{
-                  color:
-                    pathname === link.href
-                      ? "var(--color-ink)"
-                      : "var(--color-ink-soft)",
+                  color: pathname.startsWith("/productos")
+                    ? "var(--color-ink)"
+                    : "var(--color-ink-soft)",
                 }}
               >
-                {link.label}
+                Productos
+                {hasCategories && <IconChevron open={catOpen} />}
               </Link>
-            ))}
+
+              <AnimatePresence>
+                {catOpen && hasCategories && (
+                  <CategoryDropdown
+                    categories={categories}
+                    onMouseEnter={openCat}
+                    onMouseLeave={closeCat}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+
             <button
               onClick={() => setSearchOpen(true)}
               aria-label={navContent.search.label}
@@ -227,25 +299,18 @@ export default function Navbar() {
             </button>
           </nav>
 
-          {/* Derecha: Favoritos + Carrito */}
           <div className="flex items-center gap-5">
-            <Link
-              href={navContent.favorites.href}
-              aria-label={favLabel}
+            <Link href={navContent.favorites.href} aria-label={favLabel}
               className="relative flex items-center justify-center"
               style={{ color: "var(--color-ink-soft)" }}
             >
-              <IconHeart />
-              <NavBadge count={favCount} />
+              <IconHeart /><NavBadge count={favCount} />
             </Link>
-            <button
-              onClick={openCart}
-              aria-label={cartLabel}
+            <button onClick={openCart} aria-label={cartLabel}
               className="relative flex items-center justify-center"
               style={{ color: "var(--color-ink-soft)" }}
             >
-              <IconBag />
-              <NavBadge count={itemCount} />
+              <IconBag /><NavBadge count={itemCount} />
             </button>
           </div>
         </div>
@@ -254,7 +319,7 @@ export default function Navbar() {
       {/* ── Buscador (overlay) ───────────────────────────────────────────── */}
       <SearchOverlay isOpen={searchOpen} onClose={closeSearch} />
 
-      {/* ── Menú mobile (overlay fullscreen) ────────────────────────────── */}
+      {/* ── Menú mobile ──────────────────────────────────────────────────── */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -270,25 +335,18 @@ export default function Navbar() {
             className="fixed inset-0 z-40 flex flex-col lg:hidden overflow-y-auto"
             style={{ backgroundColor: "var(--color-bg)" }}
           >
-            {/* Cabecera del menú */}
+            {/* Cabecera */}
             <div
               className="flex items-center justify-between px-4 shrink-0"
-              style={{
-                height: 56,
-                borderBottom: "1px solid var(--color-line)",
-              }}
+              style={{ height: 56, borderBottom: "1px solid var(--color-line)" }}
             >
-              <Link
-                href={navContent.logoHref}
-                onClick={() => setMenuOpen(false)}
+              <Link href={navContent.logoHref} onClick={() => setMenuOpen(false)}
                 className="font-display text-sm font-semibold"
                 style={{ color: "var(--color-ink)" }}
               >
                 {navContent.logoLabel}
               </Link>
-              <button
-                onClick={() => setMenuOpen(false)}
-                aria-label={navContent.closeMenuAriaLabel}
+              <button onClick={() => setMenuOpen(false)} aria-label={navContent.closeMenuAriaLabel}
                 className="flex items-center justify-center"
                 style={{ color: "var(--color-ink-soft)", width: 32, height: 32 }}
               >
@@ -296,72 +354,92 @@ export default function Navbar() {
               </button>
             </div>
 
-            {/* Links del menú */}
+            {/* Links */}
             <nav className="flex-1 px-4 pt-8 pb-10" aria-label="Menú mobile">
               <ul>
-                {mobileNavLinks.map((link, i) => (
-                  <motion.li
-                    key={link.href}
-                    initial={
-                      prefersReducedMotion ? undefined : { opacity: 0, y: 14 }
-                    }
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      delay: 0.05 + i * 0.06,
-                      duration: 0.18,
-                    }}
-                  >
-                    <Link
-                      href={link.href}
-                      onClick={() => setMenuOpen(false)}
-                      className="font-display text-4xl font-semibold block py-5 leading-none"
-                      style={{
-                        color: "var(--color-ink)",
-                        borderBottom: "1px solid var(--color-line)",
-                      }}
-                    >
-                      {link.label}
-                    </Link>
-                  </motion.li>
-                ))}
-
-                {/* Buscar — botón, no link */}
+                {/* Productos + categorías agrupados */}
                 <motion.li
+                  key="productos"
                   initial={prefersReducedMotion ? undefined : { opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.05 + mobileNavLinks.length * 0.06, duration: 0.18 }}
+                  transition={{ delay: 0.05, duration: 0.18 }}
+                  style={{ borderBottom: "1px solid var(--color-line)" }}
+                >
+                  <Link
+                    href="/productos"
+                    onClick={() => setMenuOpen(false)}
+                    className="font-display text-4xl font-semibold block pt-5 leading-none"
+                    style={{ color: "var(--color-ink)" }}
+                  >
+                    Productos
+                  </Link>
+
+                  {/* Categorías como sub-links */}
+                  {hasCategories && (
+                    <div className="flex flex-wrap gap-x-5 gap-y-2 pt-4 pb-5">
+                      {categories.map((cat) => (
+                        <Link
+                          key={cat.slug}
+                          href={`/productos?categoria=${cat.slug}`}
+                          onClick={() => setMenuOpen(false)}
+                          className="font-body text-base transition-opacity hover:opacity-60"
+                          style={{ color: "var(--color-ink-soft)" }}
+                        >
+                          {cat.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </motion.li>
+
+                {/* Favoritos */}
+                <motion.li
+                  key="favoritos"
+                  initial={prefersReducedMotion ? undefined : { opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.11, duration: 0.18 }}
+                >
+                  <Link
+                    href={navContent.favorites.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="font-display text-4xl font-semibold block py-5 leading-none"
+                    style={{ color: "var(--color-ink)", borderBottom: "1px solid var(--color-line)" }}
+                  >
+                    Favoritos
+                  </Link>
+                </motion.li>
+
+                {/* Buscar */}
+                <motion.li
+                  key="buscar"
+                  initial={prefersReducedMotion ? undefined : { opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.17, duration: 0.18 }}
                 >
                   <button
                     onClick={openSearch}
                     className="font-display text-4xl font-semibold block py-5 leading-none w-full text-left"
-                    style={{
-                      color: "var(--color-ink)",
-                      borderBottom: "1px solid var(--color-line)",
-                    }}
+                    style={{ color: "var(--color-ink)", borderBottom: "1px solid var(--color-line)" }}
                   >
                     Buscar
                   </button>
                 </motion.li>
               </ul>
 
-              {/* Datos de contacto al pie del menú */}
+              {/* Contacto */}
               <motion.div
                 initial={prefersReducedMotion ? undefined : { opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.05 + (mobileNavLinks.length + 1) * 0.06 + 0.1, duration: 0.2 }}
+                transition={{ delay: 0.28, duration: 0.2 }}
                 className="flex flex-col gap-2 mt-12"
               >
-                <a
-                  href={`mailto:${brand.contact.email}`}
+                <a href={`mailto:${brand.contact.email}`}
                   className="font-body text-sm"
                   style={{ color: "var(--color-ink-soft)" }}
                 >
                   {brand.contact.email}
                 </a>
-                <a
-                  href={brand.contact.instagramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <a href={brand.contact.instagramUrl} target="_blank" rel="noopener noreferrer"
                   className="font-body text-sm"
                   style={{ color: "var(--color-ink-soft)" }}
                 >

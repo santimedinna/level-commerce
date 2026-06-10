@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { FavoritesProvider } from "@/store/favorites";
 import { CartProvider, DEFAULT_THRESHOLDS, type ShippingZone } from "@/store/cart";
 import { createServerClient } from "@/lib/supabase/server";
+import { getActiveCategories } from "@/lib/supabase/categories";
 import Navbar from "@/components/ui/Navbar";
 import Footer from "@/components/ui/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
@@ -49,7 +50,10 @@ export default async function StorefrontLayout({
   const rawCity = headersList.get("x-vercel-ip-city") ?? "";
   const detectedZone = detectZone(country, region, rawCity);
 
-  // 2. Obtener umbrales de envío gratis desde Supabase
+  // 2. Categorías para el navbar
+  const categories = await getActiveCategories().catch(() => []);
+
+  // 3. Obtener umbrales de envío gratis desde Supabase
   //    Fallback a DEFAULT_THRESHOLDS si hay error de red o env vars faltantes (ej. local sin .env)
   let thresholds = { ...DEFAULT_THRESHOLDS };
   try {
@@ -80,7 +84,7 @@ export default async function StorefrontLayout({
   return (
     <FavoritesProvider>
       <CartProvider initialZone={detectedZone} thresholds={thresholds}>
-        <Navbar />
+        <Navbar categories={categories} />
         <CartDrawer />
         <CapturePopup />
         {children}
