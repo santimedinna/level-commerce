@@ -5,6 +5,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import Navbar from "@/components/ui/Navbar";
 import Footer from "@/components/ui/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
+import CapturePopup from "@/components/conversion/CapturePopup";
 
 // ─── Detección de zona por IP ─────────────────────────────────────────────────
 // Usa los headers de geolocalización que Vercel inyecta gratis en cada request:
@@ -81,6 +82,7 @@ export default async function StorefrontLayout({
       <CartProvider initialZone={detectedZone} thresholds={thresholds}>
         <Navbar />
         <CartDrawer />
+        <CapturePopup />
         {children}
         <Footer />
       </CartProvider>
