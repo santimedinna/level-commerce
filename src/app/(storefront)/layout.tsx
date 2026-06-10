@@ -3,6 +3,7 @@ import { FavoritesProvider } from "@/store/favorites";
 import { CartProvider, DEFAULT_THRESHOLDS, type ShippingZone } from "@/store/cart";
 import { createServerClient } from "@/lib/supabase/server";
 import Navbar from "@/components/ui/Navbar";
+import Footer from "@/components/ui/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
 
 // ─── Detección de zona por IP ─────────────────────────────────────────────────
@@ -81,6 +82,7 @@ export default async function StorefrontLayout({
         <Navbar />
         <CartDrawer />
         {children}
+        <Footer />
       </CartProvider>
     </FavoritesProvider>
   );
