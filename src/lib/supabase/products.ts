@@ -1,6 +1,21 @@
 import { createServerClient } from "./server";
 import type { ProductWithVariants, ProductDetail } from "@/types/product";
 
+export async function getFeaturedProducts(limit = 4): Promise<ProductWithVariants[]> {
+  const supabase = createServerClient();
+  const { data } = await supabase
+    .from("products")
+    .select(
+      `id, name, slug, description, category_id,
+       base_price, images, is_active, created_at,
+       product_variants ( id, size, color, stock )`
+    )
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []) as unknown as ProductWithVariants[];
+}
+
 export async function getActiveProducts(): Promise<ProductWithVariants[]> {
   const supabase = createServerClient();
 
