@@ -23,11 +23,13 @@
 - **Nombres claros en inglés para el código** (variables, funciones, archivos).
 - **Sin dependencias innecesarias.** Antes de sumar una librería, justificá por qué.
 
-## Idioma de cara al usuario
+## Idioma y tono de cara al usuario
 
-- **Todo texto visible para quien compra: español rioplatense** (vos, tenés, hacés).
-- Dirigido a **quien compra**, no a desarrolladores ni con jerga técnica.
-- Tono directo y claro. Sin relleno.
+- **Español argentino con calidez cordobesa.** Usá el "vos" (tenés, querés, mirá), que es estándar argentino. NO uses tono rioplatense/porteño.
+- La diferencia cordobesa está en la **actitud, no en el vocabulario**: cercanía, calidez, amabilidad, un toque de humor liviano, sin soberbia. Se transmite en cómo se trata a la persona, no en imitar el acento.
+- **NO caricaturizar:** nada de tonada escrita fonéticamente, ni modismos fuertes o lunfardo pesado, ni vulgaridades. Pensá en una marca cordobesa seria y querible, no en un personaje de estereotipo.
+- **Siempre profesional, porque estamos vendiendo.** Ante la duda, elegí lo más claro y cálido por sobre lo más "canchero".
+- Dirigido a **quien compra**, no a desarrolladores ni con jerga técnica. Directo, sin relleno.
 
 ## Reglas de negocio críticas (de ARCHITECTURE.md, repetidas por importancia)
 

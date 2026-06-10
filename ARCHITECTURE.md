@@ -8,21 +8,35 @@
 
 ## 1. Objetivo del proyecto
 
-Construir **una tienda online terminada, con una base neutra y sin marca asignada todavía** — una sola tienda concreta y funcional, no una plataforma. La base es neutra (un lienzo premium), pero cada implementación sobre ella es única y a medida de la marca. Incorpora técnicas de conversión validadas (las que vienen puliendo Tienda Nube, Shopify, Mercado Libre) y sirve como **boceto/demo vendible**: una tienda real que se puede mostrar a un negocio para decir "tu marca puede tener esto".
+Construir **una tienda online terminada, con una base neutra y sin marca asignada todavía** — una sola tienda concreta y funcional, no una plataforma. La base es neutra (un lienzo premium), pero cada implementación sobre ella es única y a medida de la marca. Incorpora técnicas de conversión validadas (las que vienen puliendo Tienda Nube, Shopify, Mercado Libre).
 
-Nota de vocabulario: la base es **neutra / premium**, nunca "genérica". Una tienda hecha con este sistema no es de molde — es cuidada y se viste con la identidad única de cada marca. Evitar la palabra "genérico" en código, copy y comunicación: arrastra connotación de barato, lo contrario de lo que se construye y se vende.
+### Qué es realmente esto: una demo de captación de Level Growth
 
-**QUÉ ES (leer con atención para no malinterpretar el alcance):**
-- Es **una tienda terminada** que funciona de punta a punta: catálogo, carrito, checkout, pago.
-- Es **neutra y premium**, sin marca asignada todavía, para después trasladarla a la marca de cada cliente. (Base neutra, nunca "genérica".)
-- El traslado a cada marca lo hace **la agencia (un desarrollador), fuera del producto**, editando código y tokens. NO es una tarea del usuario final.
+**Esta web NO es una tienda de ropa y NO vende ropa.** Es una **demo declarada** que usa Level Growth Agency como herramienta de captación de clientes. La marca de ropa "Level Commerce" es ficticia: ni la ropa, ni el stock, ni las reseñas, ni los pedidos son reales. Todo es contenido de ejemplo con fines de demostración.
 
-**QUÉ NO ES (importante):**
-- **NO es una plataforma tipo Tienda Nube / Shopify / Wix.** No existe ningún "usuario que arma o personaliza su tienda" dentro del producto.
-- **NO tiene "modo personalización", ni editor visual, ni onboarding de marca, ni botón "Personalizar".** Nada de eso. De Tienda Nube/Shopify se copian las TÉCNICAS DE CONVERSIÓN del lado del comprador, no su modelo de "constructor de tiendas".
-- La única persona que toca colores, fuentes y marca es el desarrollador de la agencia, editando el código. El sitio en sí solo le sirve a UNA persona: **quien compra.**
+El verdadero objetivo: mostrarle a un futuro cliente de Level Growth (dueño de un negocio: ropa, marroquinería, ferretería, lo que sea) **cómo se ve y funciona una tienda que convierte**, para venderle el desarrollo de su web. La demo vende **desarrollos web**, no productos.
 
-**En una frase:** estamos haciendo la tienda de un negocio (con base neutra por ahora), no la herramienta con la que un negocio se hace su tienda.
+**Doble capa (clave de todo el copy y el contenido):**
+- **Capa de superficie:** una tienda de ropa creíble e impecable, que le habla al comprador de ropa. Tiene que ser un ejemplo perfecto de cómo se le habla y se le vende a un cliente final.
+- **Capa de fondo:** todo eso es, en realidad, un instructivo visual para el cliente de Level Growth — le muestra la forma correcta de venderle a SU cliente. La demo enseña vendiendo.
+- El contacto real del sitio es el de **Level Growth Agency** (no hay tienda de ropa que contactar). Cualquiera que contacta, contacta a Level Growth para comprar una web.
+
+**Disclaimer:** el sitio declara que es una demo (pop-up al entrar + sección en legales). Honestidad total: nadie cree que la tienda es real. Las "reseñas" y "números" son placeholders guía (estructura que enseña dónde y cómo van las pruebas sociales), nunca datos falsos presentados como reales.
+
+### Posicionamiento de venta (mensaje)
+
+El diferenciador de Level Growth NO es "el próximo estándar" ni "mejor que las grandes marcas" (no es real y no se vende así). El ángulo real y honesto es **el cruce que casi nadie ofrece junto**: una tienda **a medida de la marca** (no una plantilla disfrazada) **+ velocidad de élite** (sello de Level Growth) **+ entregada rápido** (porque la base ya está construida). Wix/Tienda Nube dan facilidad pero son lentos y genéricos; un desarrollo tradicional es único pero caro, lento y mal optimizado. Level Growth no obliga a elegir. La demo **demuestra** esto siendo rápida y pulida, no proclamándolo.
+
+Nota de vocabulario: la base es **neutra / premium**, nunca "genérica". Evitar la palabra "genérico" en código, copy y comunicación: arrastra connotación de barato.
+
+**QUÉ ES (alcance técnico):**
+- Una **tienda terminada** que funciona de punta a punta: catálogo, carrito, checkout, pago.
+- **Neutra y premium**, sin marca asignada, para trasladarla a la marca de cada cliente.
+- El traslado lo hace **la agencia (un desarrollador), fuera del producto**, editando contenido y tokens (ver sección 3.bis: capa contenido/estructura). NO es tarea del usuario final.
+
+**QUÉ NO ES:**
+- **NO es una plataforma tipo Tienda Nube / Shopify / Wix.** No existe "usuario que arma su tienda" dentro del producto.
+- **NO tiene modo personalización, editor visual, onboarding de marca, ni botón "Personalizar".** De Tienda Nube/Shopify se copian las TÉCNICAS DE CONVERSIÓN del lado del comprador, no su modelo de "constructor de tiendas".
 
 **Principios rectores, en este orden de prioridad:**
 
@@ -130,12 +144,19 @@ El punto crítico del modelo es el **stock por variante**: en ropa el stock no e
 - `product_id` (uuid, fk → products.id)
 - `created_at` (timestamptz)
 
-**`shipping_zones`** ← motor de envíos configurable
+**`shipping_zones`** ← motor de envíos configurable (ampliada)
 - `id` (uuid, pk)
-- `name` (text) — ej. "Córdoba Centro", "Córdoba Anillo Medio", "Periferia"
+- `name` (text) — ej. "Envío a domicilio (Córdoba Capital)", "Retiro en local", "Envío a domicilio (otra provincia)"
+- `zone_type` (text) — 'local' (Córdoba Capital), 'nacional' (otra provincia), 'pickup' (retiro en local). CHECK restringe a esos tres.
 - `flat_rate` (numeric) — tarifa plana de la zona
-- `estimated_days` (text) — ej. "24-48hs"
+- `free_shipping_threshold` (numeric, nullable) — monto desde el cual el envío es gratis en esa zona; NULL = nunca gratis
+- `requires_address` (boolean, default true) — false para retiro en local
+- `weight_based` (boolean, default false) — contemplado para futuro (tarifa por peso), no se usa aún
+- `estimated_days` (text) — ej. "En el día (durante el horario comercial)", "24 a 48hs hábiles"
+- `sort_order` (integer, default 0) — orden de visualización
 - `is_active` (boolean, default true)
+
+Datos actuales (demo): Córdoba Capital (local, $5.500, gratis desde $45.000, "En el día (durante el horario comercial)"); Retiro en local (pickup, $0, sin dirección, solo visible en Córdoba); Otra provincia (nacional, $17.500, gratis desde $90.000, "24 a 48hs hábiles").
 
 **`coupons`** ← cupones de captación / recuperación
 - `id` (uuid, pk)
@@ -148,10 +169,39 @@ El punto crítico del modelo es el **stock por variante**: en ropa el stock no e
 
 ### Row Level Security (clave de seguridad sin ser experto)
 
-- `products`, `product_variants`, `categories`, `shipping_zones`: lectura pública, escritura solo admin.
-- `orders`, `order_items`: un usuario solo ve sus propias órdenes; invitados vía token de orden.
+- `products`, `product_variants`, `categories`, `shipping_zones`: lectura pública (GRANT SELECT a anon/authenticated + política RLS), escritura solo service role.
+- `orders`, `order_items`: un usuario solo ve sus propias órdenes; invitados vía token de orden (a resolver en fase de pago).
 - `favorites`: un usuario solo ve sus propios favoritos.
-- `abandoned_carts`, `coupons`: solo accesibles desde funciones serverless con service role.
+- `abandoned_carts`, `coupons`: sin políticas → solo accesibles desde funciones serverless con service role.
+
+Nota: RLS filtra filas, pero el rol anon necesita además el GRANT SELECT base sobre las tablas de catálogo, o las consultas fallan con "permission denied".
+
+---
+
+## 3.bis Capa de contenido / estructura (clave del boilerplate)
+
+Para que pasar de demo a marca real sea limpio Y para optimizar velocidad/métricas una sola vez sobre la estructura real, **el contenido vive separado de la estructura**:
+
+- **Estructura de componentes = la de una tienda real.** No hay estructura "especial de demo". La demo es la tienda real con contenido de ejemplo.
+- **Contenido en capa separada** (`src/content/`): `config.ts` (flag DEMO_MODE, locale/moneda), `brand.ts` (nombre, tagline, contacto, etc.), `nav.ts`, `footer.ts`, y los que se sumen. Los componentes leen el contenido de acá, sin texto hardcodeado.
+- **Convención de demo:** cada valor reemplazable se marca con `// [DEMO]` en línea. Para listar todo: `grep -r "\[DEMO\]" src/content/`.
+- **Flag `DEMO_MODE`** (`NEXT_PUBLIC_DEMO_MODE`): controla lo que SOLO existe en demo (pop-up de disclaimer, placeholders de pruebas sociales). Apagado → no se renderiza.
+- **Distinguir marca ficticia vs Level Growth:** "Level Commerce" y datos de la tienda son `[DEMO]` (se reemplazan por la marca del cliente). El contacto real y el crédito "Desarrollado por Level Growth Agency" son de Level Growth (en la demo, contacto real; en una tienda de cliente, pasa a ser el del cliente).
+
+**Proceso de conversión a marca real:** editar `brand.ts` (reemplazar `[DEMO]`), ajustar `nav.ts`/`footer.ts`, cambiar tokens en `globals.css`, subir logo, `NEXT_PUBLIC_DEMO_MODE=false`, cargar catálogo real en Supabase.
+
+---
+
+## 3.ter Lógica de envíos (detallada)
+
+- **Detección de zona por IP** (headers de geolocalización de Vercel, gratis, sin permisos) como SUGERENCIA inicial editable. Sin detección (local/dev) → default 'local' (Córdoba, mercado principal).
+- **Control editable visible** en carrito y checkout: selector "Córdoba Capital / Otra provincia" (NO pide código postal). El usuario corrige si la detección falló.
+- **Opciones filtradas por zona:** Córdoba ve domicilio local + retiro en local; otra provincia ve solo envío nacional (el retiro en local solo aplica a Córdoba).
+- **Barra de envío gratis** en el carrito, con umbral según zona detectada y texto aclaratorio que indica zona + monto (ej. "Envío gratis en Córdoba Capital desde $45.000") — nunca prometer gratis incondicional.
+- **Dirección:** Córdoba pide calle/número/barrio + referencias para el cadete (CP opcional); otra provincia pide dirección completa con provincia y CP requerido; retiro en local no pide dirección.
+- **Teléfono** con selector de código de país (banderita), Argentina +54 por defecto; lista de Latinoamérica + España.
+- **Tarifa plana como aproximación** (campo `weight_based` para futuro ajuste por peso, sin usar).
+- **Stock fantasma:** el stock se descuenta al confirmar el pago (webhook). Para reducir oversell, validar stock al CREAR el pago; el empate exacto rarísimo se maneja a mano (reembolso MP). No reservar stock en checkout (sobredimensionado para ropa).
 
 ---
 
@@ -218,13 +268,22 @@ level-commerce/
 - Micro-interacciones con Framer Motion
 
 ### Motor de envíos
-- Capa configurable por zonas con tarifa plana (resuelve el problema del costo variable de Uber/mensajería en Córdoba)
-- Retiro en local (gratis) mostrado como una opción de envío más
-- Domicilio nacional (preparado, integración de correo por cliente)
+- Detección de zona por IP (Vercel) + control editable Córdoba/Otra provincia (ver sección 3.ter)
+- Tarifa plana por zona con umbral de envío gratis diferenciado por zona
+- Retiro en local (gratis, solo Córdoba) mostrado como opción de envío
+- Domicilio nacional a otra provincia vía Correo Argentino (tarifa de emprendedor; integración de API de correo por cliente a futuro)
+
+### Pruebas sociales (distribución por momento de duda, basada en estudios)
+- Ubicación > cantidad: cada señal donde resuelve la duda específica, sin sobrecargar.
+- Home: barra de beneficios bajo el hero (envío, cambios, compra segura, medios de pago) + testimonios destacados (placeholders guía que enseñan especificidad).
+- Producto: reseñas/ratings atados al producto puntual (placeholder marcado).
+- Checkout/CTA: señales de seguridad (compra protegida, medios de pago).
+- En demo: placeholders guía (estrellas + texto instructivo, "+XX envíos"), nunca datos falsos como reales.
 
 ### Recuperación
 - Carrito persistido con contacto en `abandoned_carts`
-- Secuencia de 3 emails (30-60min / 12-24h / 48-72h), incentivo solo en el último, vía Resend serverless
+- Secuencia de 3 emails (30-60min / 12-24h / 48-72h), incentivo solo en el último, vía Resend serverless (dominio de Level Growth ya disponible)
+- **Doble lectura de los emails:** en superficie recuperan el "producto de ropa"; el subtexto le habla al cliente de Level Growth ("tu máquina de ventas te está esperando"). Quien pone su mail en la demo recibe una secuencia que es, en sí misma, la demostración de por qué contratar a Level Growth.
 - Clic-to-WhatsApp prellenado para coordinación manual (gratis, sin API)
 
 ### Medición y SEO
@@ -278,5 +337,5 @@ Contempladas en el modelo de datos pero no construidas hasta que un cliente lo j
 - El estado del carrito vive en el cliente (store) pero se persiste en Supabase para recuperación.
 - Precios e items se "congelan" en la orden al momento de compra (snapshots) por si el producto cambia después.
 - El stock se descuenta en el webhook de pago confirmado, NO al agregar al carrito (evita bloquear stock de compras no concretadas).
-- Todo texto de cara al usuario en español rioplatense, dirigido a quien compra, no a desarrolladores.
+- Todo texto de cara al usuario en **español argentino con calidez cordobesa** (ver CLAUDE.md, sección Idioma y tono), con doble lectura cuando aplique. Dirigido a quien compra, no a desarrolladores.
 - Sin localStorage/sessionStorage si el código corriera en artefactos; en producción Next.js es libre el uso de almacenamiento del navegador para el carrito.
